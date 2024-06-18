@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My HTML File</title>
+</head>
+<body>
+    <h1 id="header">PONG</h1>
+    <canvas id="canvas" height="600" width="800"></canvas>
+</body>
+</html>
+<script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    document.onkeydown = checkKey;
+
+    function checkKey(e) {
+
+        e = e || window.event;        
+        paddle1.processInput(e);
+        paddle2.processInput(e);
+    }
+    
+    var ball = new ball(10, 10);
+    // Use w for up and s for down    
+    var paddle1 = new paddle(10, 10, 87, 83); 
+    var paddle2 = new paddle(780, 10);
+   
+    gameLoop();
+
+    function gameLoop() {         
+        setTimeout(function() {
+            processInput();
+            update();
+            render(); 
+            gameLoop();            
+        }, 100)
+    }
+
+    function processInput() {
+
+    }
+
+    function update() {
+        ball.move();
+    }
+
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        paddle1.draw();
+        paddle2.draw();
+        ball.draw();
+    }
+    
+    function ball(x, y) {
+        var self = this;
+        self.x = x;
+        self.y = y;
+        self.size = 10;
+        self.color = "red";
+
+        self.xSpeed = 10;
+        self.ySpeed = 10;
+
+        self.draw = function() {
+            ctx.beginPath();
+            ctx.arc(self.x, self.y, self.size, 0, 2 * Math.PI);
+            ctx.fillStyle = self.color;
+            ctx.fill();
+        }
+        self.move = function() {
+            // check if the ball is at the edge of the canvas    
+            if(self.x + self.size >= canvas.width || self.x <= 0) {
+                self.xSpeed *= -1;
+            }
+            // move the ball
+            self.x += self.xSpeed;
+            if (self.y + self.size >= canvas.height || self.y <= 0) {
+                self.ySpeed *= -1;
+            }
+            self.y += self.ySpeed;
+        }        
+    }
+
+    function paddle(x, y, upKey, downKey) {
+        var self = this;
+        self.x = x;
+        self.y = y;
+        self.width = 10;
+        self.height = 100;
+        self.color = "blue";
+
+        self.upKey = upKey || '38';
+        self.downKey = downKey || '40';
+
+        self.draw = function() {
+            ctx.fillStyle = self.color;
+            ctx.fillRect(self.x, self.y, self.width, self.height);
+        }
+
+        self.moveUp = function() {
+            self.y -= 10;
+        }
+        self.moveDown = function() {
+            self.y += 10;
+        }
+        self.processInput = function(e) {
+            if (e.keyCode == self.upKey) {
+                self.moveUp();}
+            else if (e.keyCode == self.downKey) {
+                self.moveDown();
+            }
+        }
+        
+    }
+</script>
+
+<style>
+    canvas {
+        background-color: gray;
+    }
+</style>
